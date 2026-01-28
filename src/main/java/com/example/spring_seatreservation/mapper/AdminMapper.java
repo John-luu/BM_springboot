@@ -73,6 +73,20 @@ int countUser(
             " values(${area},${type},${row},${column})")
     void addSeat(Map<String, Object> map);
 
+@Insert({
+  "<script>",
+  "INSERT INTO seat (`area`,`type`,`row`,`column`) VALUES",
+  "<foreach collection='rows' item='item' separator=','>",
+    "(#{area}, #{type}, #{item.row}, #{item.column})",
+  "</foreach>",
+  "</script>"
+})
+void addSeatsBatch(
+    @Param("area") Integer area,
+    @Param("type") Integer type,
+    @Param("rows") List<Map<String, Integer>> rows
+);
+
 
     @Delete("delete from seat where sid=${sid}")
     void deleteSeat(Map<String, Object> map);

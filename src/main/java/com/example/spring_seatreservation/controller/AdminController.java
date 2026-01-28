@@ -60,6 +60,20 @@ public R addArea(@RequestBody Map<String, Object> map) {
         adminMapper.addSeat(map);
         return R.ok();
     }
+@PostMapping("/addSeatsBatch")
+public R addSeatsBatch(@RequestBody Map<String, Object> map) {
+    Integer area = (Integer) map.get("area");
+    Integer type = (Integer) map.get("type");
+    List<Map<String, Integer>> rows =
+            (List<Map<String, Integer>>) map.get("rows");
+
+    if (area == null || type == null || rows == null || rows.isEmpty()) {
+        return R.error("参数不完整");
+    }
+
+    adminMapper.addSeatsBatch(area, type, rows);
+    return R.ok("批量添加成功");
+}
 
     @PostMapping("/deleteSeat")
     public R deleteSeat(@RequestBody Map<String, Object> map) {
