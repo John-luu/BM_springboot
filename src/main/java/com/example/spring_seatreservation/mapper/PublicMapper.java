@@ -3,6 +3,7 @@ package com.example.spring_seatreservation.mapper;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
 
@@ -28,13 +29,20 @@ public interface PublicMapper {
         "aid, " +
         "areaName, " +
         "subName, " +
-        "row_count as rows, " +      // 别名：数据库字段 → 前端字段
-        "col_count as columns " +    // 别名：数据库字段 → 前端字段
+        "row_count as `rows`, " +      // 别名：数据库字段 → 前端字段
+        "col_count as `columns` " +    // 别名：数据库字段 → 前端字段
         "FROM area")
 List<Map<String, Object>> getArea();
 
     @Select("select * from seat where area=${area}")
     List<Map<String, Object>> getAreaSeats(Map<String, Object> map);
+// 删除指定区域的所有座位
+@Delete("DELETE FROM seat WHERE area = #{areaId}")
+void deleteSeatsByArea(@Param("areaId") Integer areaId);
+
+// 删除区域
+@Delete("DELETE FROM area WHERE aid = #{areaId}")
+void deleteArea(@Param("areaId") Integer areaId);
 
     @Select("SELECT * FROM reservation WHERE state!=-1 and state !=2 and state != 4")
     List<Map<String, Object>> getNeedCheckReservation();

@@ -45,11 +45,15 @@ public class AdminController {
 
     /* ===================== 区域 / 座位 ===================== */
 
-    @PostMapping("/addArea")
-    public R addArea(@RequestBody Map<String, Object> map) {
-        adminMapper.addArea(map);
-        return R.ok();
-    }
+@PostMapping("/addArea")
+public R addArea(@RequestBody Map<String, Object> map) {
+    // 插入数据，aid会自动设置到map中
+    adminMapper.addArea(map);
+    
+    // 直接返回map，它现在包含了aid
+    // 但还需要确保有rows和columns字段（前端传的就是这些字段名）
+    return R.ok().data(map);
+}
 
     @PostMapping("/addSeat")
     public R addSeat(@RequestBody Map<String, Object> map) {

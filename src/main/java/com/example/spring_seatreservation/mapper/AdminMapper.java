@@ -2,6 +2,7 @@ package com.example.spring_seatreservation.mapper;
 
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.apache.ibatis.annotations.Update;
@@ -24,9 +25,10 @@ public interface AdminMapper {
     void addAnnounce(Map<String, Object> map);
 
 @Insert(
-    "INSERT INTO area (areaName,subName, row_count, col_count) " +
-    "VALUES (#{areaName}, #{subName},#{rows}, #{columns})"
+    "INSERT INTO area (areaName, subName, row_count, col_count) " +
+    "VALUES (#{areaName}, #{subName}, #{rows}, #{columns})"
 )
+@Options(useGeneratedKeys = true, keyProperty = "aid")
 void addArea(Map<String, Object> map);
 @Select({
   "<script>",

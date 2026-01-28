@@ -126,6 +126,28 @@ public class PublicController {
         return R.ok()
                 .put("rows", areaSeats);
     }
+    @PostMapping("/deleteAreaWithSeats")
+public R deleteAreaWithSeats(@RequestBody Map<String, Object> map) {
+    try {
+        // 获取区域ID
+        Integer areaId = (Integer) map.get("aid");
+        
+        if (areaId == null) {
+            return R.error("区域ID不能为空");
+        }
+        
+        // 1. 先删除该区域的所有座位
+        publicMapper.deleteSeatsByArea(areaId);
+        
+        // 2. 删除区域本身
+        publicMapper.deleteArea(areaId);
+        
+        return R.ok("区域删除成功");
+    } catch (Exception e) {
+        e.printStackTrace();
+        return R.error("删除区域失败: " + e.getMessage());
+    }
+}
 
     /* ===================== 用户 ===================== */
 
