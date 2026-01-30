@@ -24,69 +24,108 @@ public interface AdminMapper {
             " values(#{content},#{title},#{datetime})")
     void addAnnounce(Map<String, Object> map);
 
-@Insert(
-    "INSERT INTO area (areaName, subName, row_count, col_count) " +
-    "VALUES (#{areaName}, #{subName}, #{rows}, #{columns})"
-)
-@Options(useGeneratedKeys = true, keyProperty = "aid")
-void addArea(Map<String, Object> map);
-@Select({
-  "<script>",
-  "SELECT * FROM user",
-  "WHERE type = 0",
-  "<if test='number != null and number != \"\"'>",
-  "AND number LIKE CONCAT('%', #{number}, '%')",
-  "</if>",
-  "<if test='username != null and username != \"\"'>",
-  "AND username LIKE CONCAT('%', #{username}, '%')",
-  "</if>",
-  "ORDER BY uid DESC",
-  "LIMIT #{offset}, #{pageSize}",
-  "</script>"
-})
-List<Map<String, Object>> searchUser(
-    @Param("number") String number,
-    @Param("username") String username,
-    @Param("offset") Integer offset,
-    @Param("pageSize") Integer pageSize
-);
+    @Insert(
+        "INSERT INTO area (areaName, subName, row_count, col_count) " +
+        "VALUES (#{areaName}, #{subName}, #{rows}, #{columns})"
+    )
+    @Options(useGeneratedKeys = true, keyProperty = "aid")
+    void addArea(Map<String, Object> map);
 
-@Select({
-  "<script>",
-  "SELECT COUNT(*) FROM user",
-  "WHERE type = 0",
-  "<if test='number != null and number != \"\"'>",
-  "AND number LIKE CONCAT('%', #{number}, '%')",
-  "</if>",
-  "<if test='username != null and username != \"\"'>",
-  "AND username LIKE CONCAT('%', #{username}, '%')",
-  "</if>",
-  "</script>"
-})
-int countUser(
-    @Param("number") String number,
-    @Param("username") String username
-);
+    /* ================= 学生搜索分页 ================= */
+    @Select({
+      "<script>",
+      "SELECT * FROM user",
+      "WHERE type = 0",
+      "<if test='number != null and number != \"\"'>",
+      "AND number LIKE CONCAT('%', #{number}, '%')",
+      "</if>",
+      "<if test='username != null and username != \"\"'>",
+      "AND username LIKE CONCAT('%', #{username}, '%')",
+      "</if>",
+      "ORDER BY uid DESC",
+      "LIMIT #{offset}, #{pageSize}",
+      "</script>"
+    })
+    List<Map<String, Object>> searchUser(
+        @Param("number") String number,
+        @Param("username") String username,
+        @Param("offset") Integer offset,
+        @Param("pageSize") Integer pageSize
+    );
 
+    @Select({
+      "<script>",
+      "SELECT COUNT(*) FROM user",
+      "WHERE type = 0",
+      "<if test='number != null and number != \"\"'>",
+      "AND number LIKE CONCAT('%', #{number}, '%')",
+      "</if>",
+      "<if test='username != null and username != \"\"'>",
+      "AND username LIKE CONCAT('%', #{username}, '%')",
+      "</if>",
+      "</script>"
+    })
+    int countUser(
+        @Param("number") String number,
+        @Param("username") String username
+    );
+
+    /* ================= 教师搜索分页 ================= */
+    @Select({
+      "<script>",
+      "SELECT * FROM user",
+      "WHERE type = 1",
+      "<if test='number != null and number != \"\"'>",
+      "AND number LIKE CONCAT('%', #{number}, '%')",
+      "</if>",
+      "<if test='username != null and username != \"\"'>",
+      "AND username LIKE CONCAT('%', #{username}, '%')",
+      "</if>",
+      "ORDER BY uid DESC",
+      "LIMIT #{offset}, #{pageSize}",
+      "</script>"
+    })
+    List<Map<String, Object>> searchTeacher(
+        @Param("number") String number,
+        @Param("username") String username,
+        @Param("offset") Integer offset,
+        @Param("pageSize") Integer pageSize
+    );
+
+    @Select({
+      "<script>",
+      "SELECT COUNT(*) FROM user",
+      "WHERE type = 1",
+      "<if test='number != null and number != \"\"'>",
+      "AND number LIKE CONCAT('%', #{number}, '%')",
+      "</if>",
+      "<if test='username != null and username != \"\"'>",
+      "AND username LIKE CONCAT('%', #{username}, '%')",
+      "</if>",
+      "</script>"
+    })
+    int countTeacher(
+        @Param("number") String number,
+        @Param("username") String username
+    );
 
     @Insert("insert seat(`area`,`type`,`row`,`column`)" +
             " values(${area},${type},${row},${column})")
     void addSeat(Map<String, Object> map);
 
-@Insert({
-  "<script>",
-  "INSERT INTO seat (`area`,`type`,`row`,`column`) VALUES",
-  "<foreach collection='rows' item='item' separator=','>",
-    "(#{area}, #{type}, #{item.row}, #{item.column})",
-  "</foreach>",
-  "</script>"
-})
-void addSeatsBatch(
-    @Param("area") Integer area,
-    @Param("type") Integer type,
-    @Param("rows") List<Map<String, Integer>> rows
-);
-
+    @Insert({
+      "<script>",
+      "INSERT INTO seat (`area`,`type`,`row`,`column`) VALUES",
+      "<foreach collection='rows' item='item' separator=','>",
+        "(#{area}, #{type}, #{item.row}, #{item.column})",
+      "</foreach>",
+      "</script>"
+    })
+    void addSeatsBatch(
+        @Param("area") Integer area,
+        @Param("type") Integer type,
+        @Param("rows") List<Map<String, Integer>> rows
+    );
 
     @Delete("delete from seat where sid=${sid}")
     void deleteSeat(Map<String, Object> map);
@@ -96,7 +135,6 @@ void addSeatsBatch(
 
     @Delete("delete from announce where id=${id}")
     void deleteAnnounce(Map<String, Object> map);
-
 
     @Select("select * from user where type=1")
     List<Map<String, Object>> getTeacher();

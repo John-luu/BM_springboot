@@ -45,35 +45,35 @@ public class AdminController {
 
     /* ===================== 区域 / 座位 ===================== */
 
-@PostMapping("/addArea")
-public R addArea(@RequestBody Map<String, Object> map) {
-    // 插入数据，aid会自动设置到map中
-    adminMapper.addArea(map);
-    
-    // 直接返回map，它现在包含了aid
-    // 但还需要确保有rows和columns字段（前端传的就是这些字段名）
-    return R.ok().data(map);
-}
+    @PostMapping("/addArea")
+    public R addArea(@RequestBody Map<String, Object> map) {
+        // 插入数据，aid会自动设置到map中
+        adminMapper.addArea(map);
+        
+        // 直接返回map，它现在包含了aid
+        return R.ok().data(map);
+    }
 
     @PostMapping("/addSeat")
     public R addSeat(@RequestBody Map<String, Object> map) {
         adminMapper.addSeat(map);
         return R.ok();
     }
-@PostMapping("/addSeatsBatch")
-public R addSeatsBatch(@RequestBody Map<String, Object> map) {
-    Integer area = (Integer) map.get("area");
-    Integer type = (Integer) map.get("type");
-    List<Map<String, Integer>> rows =
-            (List<Map<String, Integer>>) map.get("rows");
 
-    if (area == null || type == null || rows == null || rows.isEmpty()) {
-        return R.error("参数不完整");
+    @PostMapping("/addSeatsBatch")
+    public R addSeatsBatch(@RequestBody Map<String, Object> map) {
+        Integer area = (Integer) map.get("area");
+        Integer type = (Integer) map.get("type");
+        List<Map<String, Integer>> rows =
+                (List<Map<String, Integer>>) map.get("rows");
+
+        if (area == null || type == null || rows == null || rows.isEmpty()) {
+            return R.error("参数不完整");
+        }
+
+        adminMapper.addSeatsBatch(area, type, rows);
+        return R.ok("批量添加成功");
     }
-
-    adminMapper.addSeatsBatch(area, type, rows);
-    return R.ok("批量添加成功");
-}
 
     @PostMapping("/deleteSeat")
     public R deleteSeat(@RequestBody Map<String, Object> map) {
@@ -97,7 +97,7 @@ public R addSeatsBatch(@RequestBody Map<String, Object> map) {
         return R.ok();
     }
 
-    /* ===================== 用户搜索（分页） ===================== */
+    /* ===================== 学生搜索（分页） ===================== */
 
     @GetMapping("/searchUser")
     public R searchUser(
@@ -115,10 +115,29 @@ public R addSeatsBatch(@RequestBody Map<String, Object> map) {
         return R.ok()
                 .put("rows", rows)
                 .put("total", total);
-        // 或：.total(total)
     }
 
-    /* ===================== 教师 ===================== */
+    /* ===================== 教师搜索（分页） ===================== */
+
+    @GetMapping("/searchTeacher")
+    public R searchTeacher(
+            @RequestParam(required = false) String number,
+            @RequestParam(required = false) String username,
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "10") Integer pageSize
+    ) {
+        int offset = (page - 1) * pageSize;
+
+        List<Map<String, Object>> rows =
+                adminMapper.searchTeacher(number, username, offset, pageSize);
+        int total = adminMapper.countTeacher(number, username);
+
+        return R.ok()
+                .put("rows", rows)
+                .put("total", total);
+    }
+
+    /* ===================== 教师（旧接口，兼容） ===================== */
 
     @GetMapping("/getTeacher")
     public R getTeacher() {
