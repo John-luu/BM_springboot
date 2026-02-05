@@ -50,6 +50,6 @@ void deleteArea(@Param("areaId") Integer areaId);
     @Update("update reservation set state=${state} where rid=${rid}")
     void updateReservation(Object state, Object rid);
 
-    @Select("SELECT * FROM reservation WHERE sid=${sid} AND state=0 OR state=3")
+    @Select("SELECT * FROM reservation WHERE sid=#{sid} AND (state=0 OR state=3)")
     Map<String, Object> getReservationBySid(Object rid);
 }

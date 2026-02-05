@@ -86,7 +86,9 @@ public class PublicController {
     public R getSignedNumber(@RequestBody Map<String, Object> map) {
         Map<String, Object> reservation =
                 publicMapper.getReservationBySid(map.get("sid"));
-
+if (reservation == null || reservation.isEmpty()) {
+    return R.error("未找到对应的预约记录");
+}
         R result = R.ok();
         Object state = reservation.get("state");
 
