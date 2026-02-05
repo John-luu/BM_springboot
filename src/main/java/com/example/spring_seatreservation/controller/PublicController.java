@@ -3,10 +3,12 @@ package com.example.spring_seatreservation.controller;
 import com.example.spring_seatreservation.Other.DynamicTaskService;
 import com.example.spring_seatreservation.Other.SignedNumber;
 import com.example.spring_seatreservation.common.*;
+import com.example.spring_seatreservation.config.ExcelUtil;
 import com.example.spring_seatreservation.mapper.PublicMapper;
 import com.example.spring_seatreservation.mapper.UserMapper;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.*;
@@ -173,6 +175,28 @@ public R deleteAreaWithSeats(@RequestBody Map<String, Object> map) {
             return R.error("注册失败");
         }
     }
+
+@PostMapping("/importStudents")
+public R importStudents(
+        @RequestParam("file") MultipartFile file,
+        @RequestParam("password") String password
+) {
+    try {
+        // 1. 解析 Excel
+        List<MyUser> users = ExcelUtil.parseStudentExcel(file, password);
+
+        // 2. 批量插入
+        for (MyUser user : users) {
+            publicMapper.insertUser(user);
+        }
+
+        return R.ok();
+    } catch (Exception e) {
+        e.printStackTrace();
+        return R.error("批量导入失败");
+    }
+}
+
 
     @PostMapping("/login")
     public R login(@RequestBody MyUser user) {

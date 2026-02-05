@@ -6,7 +6,18 @@ public class MyUser {
     String username;
     String password;
     long number;
+    int type;
 
+        // ✅ 无参构造（必须）
+    public MyUser() {
+    }
+
+    // 有参构造
+    public MyUser(long uid, String username, String password) {
+        this.uid = uid;
+        this.username = username;
+        this.password = password;
+    }
     public long getNumber() {
         return number;
     }
@@ -16,8 +27,6 @@ public class MyUser {
         return this;
     }
 
-    int type;
-
     public int getType() {
         return type;
     }
@@ -25,13 +34,6 @@ public class MyUser {
     public MyUser setType(int type) {
         this.type = type;
         return this;
-    }
-
-
-    public MyUser(long uid, String username, String password) {
-        this.uid = uid;
-        this.username = username;
-        this.password = password;
     }
 
     public long getUid() {
