@@ -13,16 +13,18 @@ public interface ForumMapper {
     /* ================= 帖子 ================= */
 
     // ✅ 普通用户：只能看到正常帖子
-    @Select("SELECT * FROM article WHERE status = 1 ORDER BY id DESC")
+    @Select("SELECT a.id, a.title, a.content, UNIX_TIMESTAMP(a.datetime)*1000 AS datetime, a.uid, a.status, u.username " +
+            "FROM article a LEFT JOIN user u ON u.uid = a.uid WHERE a.status = 1 ORDER BY a.id DESC")
     List<Map<String, Object>> getArticleForUser();
 
     // ✅ 管理员：看到所有帖子（含下架）
-    @Select("SELECT * FROM article ORDER BY id DESC")
+    @Select("SELECT a.id, a.title, a.content, UNIX_TIMESTAMP(a.datetime)*1000 AS datetime, a.uid, a.status, u.username " +
+            "FROM article a LEFT JOIN user u ON u.uid = a.uid ORDER BY a.id DESC")
     List<Map<String, Object>> getArticleForAdmin();
 
     // ✅ 发帖（默认 status = 1）
     @Insert("INSERT INTO article(title, content, datetime, uid, status) " +
-            "VALUES(#{title}, #{content}, #{datetime}, #{uid}, 1)")
+            "VALUES(#{title}, #{content}, NOW(), #{uid}, 1)")
     void insertArticle(Map<String, Object> map);
 
     // ✅ 下架 +恢复
@@ -32,12 +34,12 @@ public interface ForumMapper {
 
     // ✅ 插入评论
     @Insert("INSERT INTO comments(content, uid, datetime, aid) " +
-            "VALUES(#{content}, #{uid}, #{datetime}, #{aid})")
+            "VALUES(#{content}, #{uid}, NOW(), #{aid})")
     void insertComment(Map<String, Object> map);
 
     // ✅ 查询评论（只显示未下架帖子的评论）
-    @Select("SELECT a.*, b.username FROM comments a " +
-            "LEFT JOIN user b ON b.uid = a.uid " +
-            "WHERE aid = #{aid} ORDER BY cid DESC")
+    @Select("SELECT a.cid, a.content, UNIX_TIMESTAMP(a.datetime)*1000 AS datetime, a.uid, a.aid, b.username " +
+            "FROM comments a LEFT JOIN user b ON b.uid = a.uid " +
+            "WHERE a.aid = #{aid} ORDER BY a.cid DESC")
     List<Map<String, Object>> getComment(Map<String, Object> map);
 }
