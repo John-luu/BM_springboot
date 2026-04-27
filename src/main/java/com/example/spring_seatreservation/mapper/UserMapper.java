@@ -20,7 +20,7 @@ public interface UserMapper {
     @Select("SELECT a.*,b.*,c.* FROM reservation AS a \n" +
             "LEFT JOIN  seat AS b ON b.`sid`=a.`sid` \n" +
             "LEFT JOIN `area` AS c ON c.`aid`=b.`area` \n" +
-            "WHERE a.`uid`=#{uid}")
+            "WHERE a.`uid`=#{uid} ORDER BY a.`startTime` DESC, a.`rid` DESC")
     List<Map<String, Object>>  getReservationByUid(@Param("uid") Object uid);
 
     @Select("SELECT r.*, s.`row`, s.`column`, s.`area` AS aid, a.`areaName`, a.`subName` " +
@@ -50,6 +50,10 @@ public interface UserMapper {
 
         @Select("select * from reservation where rid=#{rid}")
         Map<String, Object> getReservationByRid(@Param("rid") Object rid);
+
+        @Select("select * from reservation where rid=#{rid} and uid=#{uid}")
+        Map<String, Object> getReservationByRidAndUid(@Param("rid") Object rid,
+                                                      @Param("uid") Object uid);
 
         @Update("update seat set state=#{state} where sid=#{sid}")
         void updateSeat(@Param("state") int state, @Param("sid") Object sid);
@@ -82,7 +86,7 @@ public interface UserMapper {
 
         @Select("SELECT COUNT(*) FROM reservation " +
                 "WHERE sid=#{sid} " +
-                "AND state != -1 AND state != 2 AND state != 4 " +
+                "AND state != -1 AND state != 2 AND state != 4 AND state != 5 " +
                 "AND startTime < #{endTime} AND endTime > #{startTime}")
         int countSeatTimeOverlap(@Param("sid") Object sid,
                                  @Param("startTime") long startTime,

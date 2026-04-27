@@ -255,6 +255,61 @@ public class UserController {
         return R.ok().put("rows", list);
     }
 
+    @PostMapping("/cancelReservation")
+    public R cancelReservation(@RequestBody Map<String, Object> map) {
+        Object uidObj = map.get("uid");
+        Object ridObj = map.get("rid");
+        if (uidObj == null || ridObj == null) {
+            return R.error("缺少预约信息");
+        }
+
+        Long uid;
+        Long rid;
+        try {
+            uid = Long.parseLong(String.valueOf(uidObj));
+            rid = Long.parseLong(String.valueOf(ridObj));
+        } catch (Exception e) {
+            return R.error("预约参数格式错误");
+        }
+
+        Map<String, Object> reservation = userMapper.getReservationByRidAndUid(rid, uid);
+        if (reservation == null || reservation.isEmpty()) {
+            return R.error("预约记录不存在");
+        }
+
+        Object stateObj = reservation.get("state");
+        int state;
+        try {
+            state = Integer.parseInt(String.valueOf(stateObj));
+        } catch (Exception e) {
+            return R.error("预约状态异常");
+        }
+
+        if (state == ReservationCode.CANCELED) {
+            return R.error("该预约已取消");
+        }
+        if (state != ReservationCode.TIME_BEGAN) {
+            return R.error("当前预约状态不可取消");
+        }
+
+        long startTime = parseObjectTimeToMillis(reservation.get("startTime"));
+        long now = System.currentTimeMillis();
+        if (startTime <= now) {
+            return R.error("预约已开始，无法取消");
+        }
+
+        long twoHoursMillis = 2 * 60 * 60 * 1000L;
+        long diff = startTime - now;
+        if (diff < twoHoursMillis) {
+            return R.error("距离预约开始不足2小时，无法取消");
+        }
+
+        userMapper.updateReservation(ReservationCode.CANCELED, rid);
+        dynamicTask.stop(ReservationCode.UNSIGNED + "-" + String.valueOf(reservation.get("sid")));
+        dynamicTask.stop(ReservationCode.FINISH + "-" + String.valueOf(reservation.get("sid")));
+        return R.ok("取消预约成功");
+    }
+
     @PostMapping("/getScore")
     public R getScore(@RequestBody Map<String, Object> map) {
         Object uid = map.get("uid");

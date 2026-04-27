@@ -47,7 +47,7 @@ List<Map<String, Object>> getArea();
             "FROM seat s " +
             "JOIN reservation r ON s.sid = r.sid " +
             "WHERE s.area = #{area} " +
-            "AND r.state != -1 AND r.state != 2 AND r.state != 4 " +
+            "AND r.state != -1 AND r.state != 2 AND r.state != 4 AND r.state != 5 " +
             "AND r.startTime < #{endTime} " +
             "AND r.endTime > #{startTime}")
     List<Integer> getReservedSeatIdsInArea(@Param("area") int area,
@@ -61,7 +61,7 @@ void deleteSeatsByArea(@Param("areaId") Integer areaId);
 @Delete("DELETE FROM area WHERE aid = #{areaId}")
 void deleteArea(@Param("areaId") Integer areaId);
 
-    @Select("SELECT * FROM reservation WHERE state!=-1 and state !=2 and state != 4")
+    @Select("SELECT * FROM reservation WHERE state!=-1 and state !=2 and state != 4 and state != 5")
     List<Map<String, Object>> getNeedCheckReservation();
 
     @Update("update reservation set state=${state} where rid=${rid}")

@@ -40,7 +40,7 @@ public class AdminController {
 
     @PostMapping("/addAnnounce")
     public R addAnnounce(@RequestBody Map<String, Object> map) {
-        map.put("datetime", System.currentTimeMillis());
+        map.put("datetime", new java.sql.Timestamp(System.currentTimeMillis()));
         adminMapper.addAnnounce(map);
         return R.ok();
     }

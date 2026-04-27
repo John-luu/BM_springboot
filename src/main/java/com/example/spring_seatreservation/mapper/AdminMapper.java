@@ -162,7 +162,7 @@ public interface AdminMapper {
       "LEFT JOIN user u ON u.uid = r.uid",
       "LEFT JOIN seat s ON s.sid = r.sid",
       "LEFT JOIN area a ON a.aid = s.area",
-      "WHERE 1 = 1",
+      "WHERE r.state != 5",
       "<if test='date != null and date != \"\"'>",
       "AND DATE(r.startTime) = #{date}",
       "</if>",
@@ -179,7 +179,7 @@ public interface AdminMapper {
     @Select({
       "<script>",
       "SELECT COUNT(*) FROM reservation r",
-      "WHERE 1 = 1",
+      "WHERE r.state != 5",
       "<if test='date != null and date != \"\"'>",
       "AND DATE(r.startTime) = #{date}",
       "</if>",
@@ -196,7 +196,7 @@ public interface AdminMapper {
       "SUM(CASE WHEN r.state = 3 THEN 1 ELSE 0 END) AS leaveTotal,",
       "SUM(CASE WHEN r.state IN (2, 4) THEN 1 ELSE 0 END) AS violateTotal",
       "FROM reservation r",
-      "WHERE 1 = 1",
+      "WHERE r.state != 5",
       "<if test='date != null and date != \"\"'>",
       "AND DATE(r.startTime) = #{date}",
       "</if>",
@@ -294,12 +294,12 @@ public interface AdminMapper {
                 @Param("operatorUid") Long operatorUid,
                 @Param("operatorName") String operatorName);
 
-    @Select("SELECT `startTime`,`endTime` FROM reservation  WHERE state=-1 ORDER BY startTime")
+    @Select("SELECT `startTime`,`endTime` FROM reservation  WHERE state=-1 AND state!=5 ORDER BY startTime")
     List<Map<String, Object>> getStatistics();
 
     @Select("SELECT COUNT(a.`uid`) as counter,b.`number`,b.`username` FROM reservation AS a \n" +
             "LEFT JOIN USER AS b ON b.`uid`=a.`uid`\n" +
-            "WHERE a.`state`=-1 GROUP BY a.`uid` ORDER BY COUNT(a.`uid`)")
+          "WHERE a.`state`=-1 AND a.`state`!=5 GROUP BY a.`uid` ORDER BY COUNT(a.`uid`)")
     List<Map<String, Object>> getUserCounter();
 
         @Select({
@@ -308,6 +308,7 @@ public interface AdminMapper {
           "FROM reservation r",
           "LEFT JOIN user u ON u.uid = r.uid",
           "WHERE r.state IN (1, 3, -1)",
+          "AND r.state != 5",
           "AND u.type = 0",
           "<if test='startTime != null'>",
           "AND r.startTime <![CDATA[>=]]> FROM_UNIXTIME(#{startTime} / 1000)",
@@ -329,7 +330,7 @@ public interface AdminMapper {
           "<script>",
           "SELECT DATE_FORMAT(r.startTime, '%Y-%m') AS period, COUNT(*) AS total",
           "FROM reservation r",
-          "WHERE 1 = 1",
+          "WHERE r.state != 5",
           "<if test='startTime != null'>",
           "AND r.startTime <![CDATA[>=]]> FROM_UNIXTIME(#{startTime} / 1000)",
           "</if>",
@@ -350,7 +351,7 @@ public interface AdminMapper {
           "<script>",
           "SELECT DATE_FORMAT(r.startTime, '%Y-%m-%d') AS period, COUNT(*) AS total",
           "FROM reservation r",
-          "WHERE 1 = 1",
+          "WHERE r.state != 5",
           "<if test='startTime != null'>",
           "AND r.startTime <![CDATA[>=]]> FROM_UNIXTIME(#{startTime} / 1000)",
           "</if>",
@@ -372,7 +373,7 @@ public interface AdminMapper {
           "SELECT (HOUR(r.startTime) * 2 + IF(MINUTE(r.startTime) &gt;= 30, 1, 0)) AS slotIndex,",
           "COUNT(*) AS total",
           "FROM reservation r",
-          "WHERE 1 = 1",
+          "WHERE r.state != 5",
           "<if test='startTime != null'>",
           "AND r.startTime <![CDATA[>=]]> FROM_UNIXTIME(#{startTime} / 1000)",
           "</if>",
@@ -399,6 +400,7 @@ public interface AdminMapper {
           "SUM(CASE WHEN r.state IN (2, 4) THEN 1 ELSE 0 END) AS violateTotal",
           "FROM reservation r",
           "WHERE DATE(r.startTime) = #{date}",
+          "AND r.state != 5",
           "</script>"
         })
         Map<String, Object> getDayStatisticsSummary(@Param("date") String date);
@@ -416,6 +418,7 @@ public interface AdminMapper {
           "LEFT JOIN seat s ON s.sid = r.sid",
           "LEFT JOIN area a ON a.aid = s.area",
           "WHERE DATE(r.startTime) = #{date}",
+          "AND r.state != 5",
           "AND u.type = 0",
           "ORDER BY r.startTime ASC, r.rid ASC",
           "LIMIT 500",

@@ -6,6 +6,7 @@ public class ReservationCode {
     public static final int UNSIGNED = 2;//预约未及时签到
     public static final int LEAVE = 3;//离开座位
     public static final int LEAVE_UNSIGNED = 4;//离开60分钟未及时签到
+    public static final int CANCELED = 5;//用户主动取消预约
     public static final int FINISH = -1;//已完成
 
 }
